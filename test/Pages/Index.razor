@@ -1,0 +1,32 @@
+﻿@page "/"
+
+@inject NavigationManager _nav
+
+<PageTitle>Index</PageTitle>
+
+
+<ul>
+    <li @onclick=@(() => this._navTo("web-crypto"))>Web Crypto API interfaces</li>
+    <li @onclick=@(() => this._navTo("cryptography"))>Cryptography</li>
+</ul>
+
+@code {
+
+    /// <summary>
+    ///
+    /// </summary>
+    public Index()
+    {
+
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="url"></param>
+    public void
+    _navTo(string url)
+    {
+        this._nav.NavigateTo(url);
+    }
+}

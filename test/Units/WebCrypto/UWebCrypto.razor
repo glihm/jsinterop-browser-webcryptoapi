@@ -1,0 +1,86 @@
+﻿@using JSInterop.Browser.TestApp.Units
+
+@using JSInterop.Browser.WebCryptoAPI.JSHelpers
+@using JSInterop.Browser.WebCryptoAPI.Interfaces
+
+@inject Crypto _crypto
+
+<div id="main">
+
+    <UnitTest TestName="cryptoWebApiSupport"
+              MethodToBeTested="@this._cryptoSupport" />
+
+    <UnitTest TestName="getRandomValues"
+              MethodToBeTested="@this._getRandomValues" />
+
+    <UnitTest TestName="randomUUID"
+              MethodToBeTested="@this._randomUUID" />
+
+</div>
+
+
+@code {
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public UWebCrypto()
+    {
+
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    _cryptoSupport()
+    {
+        JSResultVoid res = await this._crypto.IsWebCryptoAPISupported();
+        if (!res)
+        {
+            return UnitTestResult.Failed($"Crytpo Web Api is not supported. {res.Error?.Message}");
+        }
+        else
+        {
+            return UnitTestResult.Passed();
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    _getRandomValues()
+    {
+        byte[] vals = new byte[200];
+        JSResultVoid res = await this._crypto.GetRandomValues(vals);
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        // TODO: how to test randomness in a better way?
+        return vals.Select(b => (int)b).Sum() > 0 ? UnitTestResult.Passed() :
+                                                    UnitTestResult.Failed("Generated values seems to NOT be random.");
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    _randomUUID()
+    {
+        JSResultValue<Guid> res = await this._crypto.RandomUUID();
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        return res.GetValueOrThrow() != Guid.Empty ? UnitTestResult.Passed() :
+                                                     UnitTestResult.Failed("Empty GUID was generated.");
+    }
+
+}

@@ -1,0 +1,59 @@
+﻿@using JSInterop.Browser.TestApp.Units
+
+@using JSInterop.Browser.WebCryptoAPI.JSHelpers
+@using JSInterop.Browser.WebCryptoAPI.Interfaces
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA
+
+@inject Crypto _crypto
+@inject ILogger<UWebCryptoSubtleSHA> _logger
+
+<div id="main">
+
+    <UnitTest TestName="SHA digest"
+              MethodToBeTested="@this._digest" />
+
+</div>
+
+
+@code {
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public UWebCryptoSubtleSHA()
+    {
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    _digest()
+    {
+        byte[] data = System.Text.Encoding.ASCII.GetBytes("12345");
+        await this._crypto.Subtle.Digest(ShaAlgorithm.SHA256, data);
+
+        JSResultValue<byte[]> res = await this._crypto.Subtle.Digest(
+            ShaAlgorithm.SHA256,
+            data);
+
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        byte[] hash = res.GetValueOrThrow();
+        String hashString = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+
+        if (hashString == "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5")
+        {
+            return UnitTestResult.Passed();
+        }
+        else
+        {
+            return UnitTestResult.Failed("hash is not the expected one.");
+        }
+    }
+
+}

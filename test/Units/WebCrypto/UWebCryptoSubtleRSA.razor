@@ -1,0 +1,178 @@
+﻿@using JSInterop.Browser.TestApp.Units
+
+@using JSInterop.Browser.WebCryptoAPI.JSHelpers
+@using JSInterop.Browser.WebCryptoAPI.Interfaces
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.RSA
+
+@inject Crypto _crypto
+
+<div id="main">
+
+    <UnitTest TestName="RSA generateKey"
+              MethodToBeTested="@this.GenerateKey" />
+
+    <UnitTest TestName="RSA exportKey"
+              MethodToBeTested="@this.ExportKey" />
+
+    <UnitTest TestName="RSA OAEP encrypt/decrypt"
+              MethodToBeTested="@this.EncryptDecrypt" />
+
+    <UnitTest TestName="RSA SSA sign/verify"
+              MethodToBeTested="@this.SignVerifySSA" />
+
+    <UnitTest TestName="RSA PSS sign/verify"
+              MethodToBeTested="@this.SignVerifyPSS" />
+
+</div>
+
+
+@code {
+    private byte[] _data1;
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public UWebCryptoSubtleRSA()
+    {
+        this._data1 = new byte[] { 1, 2, 3 };
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    GenerateKey()
+    {
+        RsaHashedKeyGenParams gen = new(RsaAlgorithm.OAEP, 2048, ShaAlgorithm.SHA256);
+
+        JSResultValue<CryptoKeyPairDescriptor> res = await this._crypto.Subtle.GenerateKeyPair(
+            gen,
+            false,
+            CryptoKeyUsage.Encrypt | CryptoKeyUsage.Decrypt);
+
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        gen = new(RsaAlgorithm.PSS, 2048, ShaAlgorithm.SHA256);
+        res = await this._crypto.Subtle.GenerateKeyPair(
+            gen,
+            false,
+            CryptoKeyUsage.Sign | CryptoKeyUsage.Verify);
+
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        gen = new(RsaAlgorithm.SSA_PKCS1_v1_5, 2048, ShaAlgorithm.SHA256);
+        res = await this._crypto.Subtle.GenerateKeyPair(
+            gen,
+            false,
+            CryptoKeyUsage.Sign | CryptoKeyUsage.Verify);
+
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    ExportKey()
+    {
+        RsaHashedKeyGenParams gen = new(RsaAlgorithm.OAEP, 2048, ShaAlgorithm.SHA256);
+
+        JSResultValue<CryptoKeyPairDescriptor> res = await this._crypto.Subtle.GenerateKeyPair(
+            gen,
+            true,
+            CryptoKeyUsage.Encrypt | CryptoKeyUsage.Decrypt);
+
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        CryptoKeyPairDescriptor ckp = res.GetValueOrThrow();
+        if (ckp.PublicKey is null || ckp.PrivateKey is null)
+        {
+            return UnitTestResult.Failed("Keys are missing.");
+        }
+
+        JSResultValue<byte[]> exportPubRes = await this._crypto.Subtle.ExportKey(
+            CryptoKeyFormat.SubjectPublicKeyInfo,
+            ckp.PublicKey);
+        if (!exportPubRes)
+        {
+            return UnitTestResult.Failed(exportPubRes.Error?.Message);
+        }
+
+        JSResultValue<byte[]> exportPrvRes = await this._crypto.Subtle.ExportKey(
+            CryptoKeyFormat.PKCS8,
+            ckp.PrivateKey);
+        if (!exportPrvRes)
+        {
+            return UnitTestResult.Failed(exportPrvRes.Error?.Message);
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    EncryptDecrypt()
+    {
+        RsaHashedKeyGenParams gen = new(RsaAlgorithm.OAEP, 2048, ShaAlgorithm.SHA256);
+
+        JSResultValue<CryptoKeyPairDescriptor> resKp = await this._crypto.Subtle.GenerateKeyPair(
+            gen,
+            false,
+            CryptoKeyUsage.Encrypt | CryptoKeyUsage.Decrypt);
+
+        if (!resKp)
+        {
+            return UnitTestResult.Failed(resKp.Error?.Message);
+        }
+
+        RsaOaepParams prs = new();
+        return await UWebCryptoCommon.EncryptDecrypt(this._crypto, resKp.GetValueOrThrow(), prs, prs);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    SignVerifySSA()
+    {
+        RsaHashedKeyGenParams gen = new(RsaAlgorithm.SSA_PKCS1_v1_5, 2048, ShaAlgorithm.SHA256);
+        RsaSsaPkcs1Params prs = new();
+
+        return await UWebCryptoCommon.SignVerify(this._crypto, gen, prs, prs);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    SignVerifyPSS()
+    {
+        RsaHashedKeyGenParams gen = new(RsaAlgorithm.PSS, 2048, ShaAlgorithm.SHA256);
+        RsaPssParams prs = new();
+        return await UWebCryptoCommon.SignVerify(this._crypto, gen, prs, prs);
+    }
+
+}

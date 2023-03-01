@@ -1,0 +1,351 @@
+﻿@using JSInterop.Browser.TestApp.Units
+
+@using JSInterop.Browser.WebCryptoAPI.Interfaces
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.EC
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.AES
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys
+@using JSInterop.Browser.WebCryptoAPI.Cryptography
+@using JSInterop.Browser.WebCryptoAPI.Cryptography.AES
+@using JSInterop.Browser.WebCryptoAPI.Cryptography.RSA
+@using JSInterop.Browser.WebCryptoAPI.Cryptography.EC
+@using JSInterop.Browser.WebCryptoAPI.Cryptography.HMAC
+@using JSInterop.Browser.WebCryptoAPI.Cryptography.Random
+
+@inject Crypto _crypto
+@inject CryptoRandom _cryptoRand
+@inject AesFactory _aesFactory
+@inject RsaFactory _rsaFactory
+@inject EcFactory _ecFactory
+@inject HmacFactory _hmacFactory
+
+<div id="main">
+
+    <UnitTest TestName="AesGcm"
+              MethodToBeTested="@this.AesGcmTest" />
+
+    <UnitTest TestName="Rsa OAEP"
+              MethodToBeTested="@this.RsaOaepTest" />
+
+    <UnitTest TestName="Rsa SSA"
+              MethodToBeTested="@this.RsaSsaTest" />
+
+    <UnitTest TestName="ECDSA"
+              MethodToBeTested="@this.EcdsaTest" />
+
+    <UnitTest TestName="ECDH"
+              MethodToBeTested="@this.EcdhTest" />
+
+    <UnitTest TestName="HMAC"
+              MethodToBeTested="@this.HmacTest" />
+</div>
+
+
+@code {
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public UWebCryptography()
+    {
+        Task.Run(async () =>
+            {
+                await Task.Delay(5000);
+                await this._crypto.Subtle.DumpKeys();
+            });
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    AesGcmTest()
+    {
+        await using AesCbc? aesCbc = await this._aesFactory.Create<AesCbc>(extractable: true);
+        if (aesCbc is not null)
+        {
+            string? jwk = await aesCbc.ExportKeyJSONWebKey();
+            Console.WriteLine(jwk);
+
+            byte[]? buf = await aesCbc.ExportKeyRaw();
+            if (buf is not null)
+            {
+                Console.WriteLine(BitConverter.ToString(buf));
+            }
+        }
+
+        byte[]? aesKey = await this._aesFactory.GenerateRandomIv(32);
+        if (aesKey is null)
+        {
+            return UnitTestResult.Failed("Can't generate aesKey.");
+        }
+
+        await using AesGcm? aesGcm = await this._aesFactory.Create<AesGcm>(aesKey);
+        if (aesGcm is null)
+        {
+            return UnitTestResult.Failed("Can't get AesGcm created.");
+        }
+
+        byte[]? iv = await this._aesFactory.GenerateRandomIv(12);
+        if (iv is null)
+        {
+            return UnitTestResult.Failed("Can't generate iv.");
+        }
+
+        byte[] data = new byte[] { 1, 2, 3 };
+
+        byte[]? ciphertext = await aesGcm.Encrypt(data, iv);
+        if (ciphertext is null)
+        {
+            return UnitTestResult.Failed();
+        }
+
+        byte[]? plaintext = await aesGcm.Decrypt(ciphertext, iv);
+        if (plaintext is null)
+        {
+            return UnitTestResult.Failed();
+        }
+
+        if (plaintext.SequenceEqual(data))
+        {
+            return UnitTestResult.Passed();
+        }
+        else
+        {
+            return UnitTestResult.Failed();
+        }
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    RsaOaepTest()
+    {
+        // Generate the keypair on the fly.
+        await using RsaOaep? rsaOaep = await this._rsaFactory.Create<RsaOaep>(
+            2048,
+            ShaAlgorithm.SHA512,
+            extractable: true);
+
+        if (rsaOaep is null)
+        {
+            return UnitTestResult.Failed("key generation failed.");
+        }
+
+        byte[]? publicKeyPem = await rsaOaep.ExportPublicKey(convertToPem: true);
+        if (publicKeyPem is not null)
+        {
+            Console.WriteLine($"**************PEM***************\n{System.Text.Encoding.ASCII.GetString(publicKeyPem)}");
+        }
+
+        byte[]? privateKeyPem = await rsaOaep.ExportPrivateKey(convertToPem: true);
+        if (privateKeyPem is not null)
+        {
+            Console.WriteLine($"**************PEM***************\n{System.Text.Encoding.ASCII.GetString(privateKeyPem)}");
+        }
+
+        byte[] data = { 1, 2, 3 };
+
+        byte[]? ciphertext = await rsaOaep.Encrypt(data);
+        if (ciphertext is null)
+        {
+            return UnitTestResult.Failed("encryption failed.");
+        }
+
+        byte[]? plaintext = await rsaOaep.Decrypt(ciphertext);
+        if (plaintext is null)
+        {
+            return UnitTestResult.Failed("decryption failed.");
+        }
+
+        if (!plaintext.SequenceEqual(data))
+        {
+            return UnitTestResult.Failed("decrypted plaintext is not equal to original data");
+        }
+
+        // Test with one public key only.
+
+        // Test with one private key only.
+
+        // Test importing both public and private key.
+
+        return UnitTestResult.Passed();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    RsaSsaTest()
+    {
+        // Generate the keypair on the fly.
+        await using RsaSsa? rsa = await this._rsaFactory.Create<RsaSsa>(
+            4096,
+            ShaAlgorithm.SHA512,
+            extractable: true);
+
+        if (rsa is null)
+        {
+            return UnitTestResult.Failed("key generation failed.");
+        }
+
+        byte[] data = { 1, 2, 3 };
+
+        byte[]? signature = await rsa.Sign(data);
+        if (signature is null)
+        {
+            return UnitTestResult.Failed("signature failed.");
+        }
+
+        bool isSignatureValid = await rsa.Verify(data, signature);
+
+        if (!isSignatureValid)
+        {
+            return UnitTestResult.Failed("Signature is not valid.");
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    EcdsaTest()
+    {
+        await using Ecdsa? ecdsa = await this._ecFactory.Create<Ecdsa>(
+            EcNamedCurve.P_521,
+            extractable: true);
+
+        if (ecdsa is null)
+        {
+            return UnitTestResult.Failed("key generation failed.");
+        }
+
+        byte[] data = { 1, 2, 3 };
+
+        byte[]? signature = await ecdsa.Sign(data, ShaAlgorithm.SHA512);
+        if (signature is null)
+        {
+            return UnitTestResult.Failed("signature failed.");
+        }
+
+        bool isSignatureValid = await ecdsa.Verify(data, ShaAlgorithm.SHA512, signature);
+
+        if (!isSignatureValid)
+        {
+            return UnitTestResult.Failed("Signature is not valid.");
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    HmacTest()
+    {
+        byte[] data = { 1, 2, 3 };
+
+
+        byte[]? randomKey = await this._cryptoRand.GenerateRandomValues(128);
+        if (randomKey is not null)
+        {
+            await using Hmac? himport = await this._hmacFactory.Create(randomKey, ShaAlgorithm.SHA512);
+            if (himport is not null)
+            {
+                byte[]? s = await himport.Sign(data);
+                if (s is not null)
+                {
+                    bool isOk = await himport.Verify(data, s);
+                    if (!isOk)
+                    {
+                        return UnitTestResult.Failed("Test from imported key failed");
+                    }
+                }
+            }
+        }
+
+        await using Hmac? hmac = await this._hmacFactory.Create(
+            ShaAlgorithm.SHA512,
+            extractable: true);
+
+        if (hmac is null)
+        {
+            return UnitTestResult.Failed("key generation failed.");
+        }
+
+        byte[]? signature = await hmac.Sign(data);
+        if (signature is null)
+        {
+            return UnitTestResult.Failed("signature failed.");
+        }
+
+        bool isSignatureValid = await hmac.Verify(data, signature);
+
+        if (!isSignatureValid)
+        {
+            return UnitTestResult.Failed("Signature is not valid.");
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    EcdhTest()
+    {
+        Ecdh? eAlice = await this._ecFactory.Create<Ecdh>(EcNamedCurve.P_256);
+        Ecdh? eBob = await this._ecFactory.Create<Ecdh>(EcNamedCurve.P_256);
+
+        if (eAlice is null || eBob is null)
+        {
+            return UnitTestResult.Failed("Gen failed.");
+        }
+
+        CryptoKeyDescriptor? secretAlice = await eAlice.DeriveAesKey(eBob.GetPublicKeyOrThrow(), AesAlgorithm.GCM);
+        CryptoKeyDescriptor? secretBob = await eBob.DeriveAesKey(eAlice.GetPublicKeyOrThrow(), AesAlgorithm.GCM);
+
+        if (secretAlice is null || secretBob is null)
+        {
+            return UnitTestResult.Failed("DeriveAesKey failed.");
+        }
+
+        AesGcm? aesAlice = this._aesFactory.Create<AesGcm>(secretAlice);
+        AesGcm? aesBob = this._aesFactory.Create<AesGcm>(secretBob);
+
+        if (aesAlice is null || aesBob is null)
+        {
+            return UnitTestResult.Failed("Aes instanciation failed.");
+        }
+
+        byte[] data = { 1, 2, 3 };
+        byte[]? iv = await this._cryptoRand.GenerateRandomValues(12);
+        if (iv is null)
+        {
+            return UnitTestResult.Failed("Can't get random IV.");
+        }
+
+        byte[]? cipherAlice = await aesAlice.Encrypt(data, iv);
+        if (cipherAlice is not null)
+        {
+            byte[]? plainBob = await aesBob.Decrypt(cipherAlice, iv);
+            if (plainBob is null || !plainBob.SequenceEqual(data))
+            {
+                return UnitTestResult.Failed("Alice and Bob failed.");
+            }
+        }
+
+        return UnitTestResult.Passed();
+    }
+}

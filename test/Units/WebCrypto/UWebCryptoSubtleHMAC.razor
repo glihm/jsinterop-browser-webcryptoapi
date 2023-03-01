@@ -1,0 +1,154 @@
+﻿@using JSInterop.Browser.TestApp.Units
+
+@using JSInterop.Browser.WebCryptoAPI.JSHelpers
+@using JSInterop.Browser.WebCryptoAPI.Interfaces
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.HMAC
+
+@inject Crypto _crypto
+
+<div id="main">
+
+    <UnitTest TestName="HMAC generateKey"
+              MethodToBeTested="@this._generateKey" />
+
+    <UnitTest TestName="HMAC importKey"
+              MethodToBeTested="@this._importKey" />
+
+    <UnitTest TestName="HMAC exportKey"
+              MethodToBeTested="@this._exportKey" />
+
+    <UnitTest TestName="HMAC sign"
+              MethodToBeTested="@this._signVerify" />
+
+</div>
+
+
+@code {
+    private byte[] _data1;
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public UWebCryptoSubtleHMAC()
+    {
+        this._data1 = new byte[] { 1, 2, 3 };
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    _generateKey()
+    {
+        HmacKeyGenParams gen = new(ShaAlgorithm.SHA512);
+
+        JSResultValue<CryptoKeyDescriptor> res = await this._crypto.Subtle.GenerateKey(
+            gen,
+            false,
+            CryptoKeyUsage.Sign | CryptoKeyUsage.Verify);
+
+        if (!res)
+        {
+            UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    _importKey()
+    {
+        byte[] key = new byte[32];
+        await this._crypto.GetRandomValues(key);
+
+        HmacImportParams prs = new(ShaAlgorithm.SHA256);
+
+        JSResultValue<CryptoKeyDescriptor> importRes = await this._crypto.Subtle.ImportKey(
+            CryptoKeyFormat.Raw,
+            key,
+            prs,
+            false,
+            CryptoKeyUsage.Sign | CryptoKeyUsage.Verify
+        );
+
+        await this._crypto.Subtle.DumpKeys();
+
+        if (!importRes)
+        {
+            return UnitTestResult.Failed(importRes.Error?.Message);
+        }
+
+        CryptoKeyDescriptor ck = importRes.GetValueOrThrow();
+        HmacParams prs2 = new();
+
+        return await UWebCryptoCommon.SignVerify(this._crypto, ck, prs2, prs2);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    _exportKey()
+    {
+        byte[] key = new byte[32];
+        await this._crypto.GetRandomValues(key);
+
+        HmacImportParams prs = new(ShaAlgorithm.SHA256);
+
+        JSResultValue<CryptoKeyDescriptor> importRes = await this._crypto.Subtle.ImportKey(
+            CryptoKeyFormat.Raw,
+            key,
+            prs,
+            true,
+            CryptoKeyUsage.Sign | CryptoKeyUsage.Verify
+        );
+
+        CryptoKeyDescriptor ck = importRes.GetValueOrThrow();
+
+        JSResultValue<byte[]> rawKeyRes = await this._crypto.Subtle.ExportKey(
+            CryptoKeyFormat.Raw,
+            ck);
+
+        if (!rawKeyRes)
+        {
+            return UnitTestResult.Failed(rawKeyRes.Error?.Message);
+        }
+
+        return rawKeyRes.GetValueOrThrow().SequenceEqual(key) ? UnitTestResult.Passed() :
+                                                                UnitTestResult.Failed("Exported key differs from imported key.");
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    _signVerify()
+    {
+        HmacKeyGenParams gen = new(ShaAlgorithm.SHA512);
+        HmacParams prs = new();
+
+        JSResultValue<CryptoKeyDescriptor> resCk = await this._crypto.Subtle.GenerateKey(
+            gen,
+            false,
+            CryptoKeyUsage.Sign | CryptoKeyUsage.Verify);
+
+        if (!resCk)
+        {
+            return UnitTestResult.Failed(resCk.Error?.Message);
+        }
+
+        CryptoKeyDescriptor ck = resCk.GetValueOrThrow();
+        return await UWebCryptoCommon.SignVerify(this._crypto, ck, prs, prs);
+    }
+
+
+}

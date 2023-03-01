@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33417.168
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSInterop.Browser.Samples", "JSInterop.Browser.Samples.csproj", "{7F98FBA9-DE3F-4810-AAFF-ADA191DC8559}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7F98FBA9-DE3F-4810-AAFF-ADA191DC8559}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F98FBA9-DE3F-4810-AAFF-ADA191DC8559}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F98FBA9-DE3F-4810-AAFF-ADA191DC8559}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F98FBA9-DE3F-4810-AAFF-ADA191DC8559}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {404BA4E8-AABE-4647-A6F1-AC2589FC3C9F}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,91 @@
+﻿@page "/decrypt"
+
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys
+
+@using JSInterop.Browser.WebCryptoAPI.Cryptography
+@using JSInterop.Browser.WebCryptoAPI.Cryptography.Random
+@using JSInterop.Browser.WebCryptoAPI.Cryptography.AES
+@using JSInterop.Browser.WebCryptoAPI.Cryptography.RSA
+
+@inject AesFactory _aesFactory
+@inject RsaFactory _rsaFactory
+@inject CryptoRandom _cryptoRand
+
+
+<PageTitle>Decrypt</PageTitle>
+
+<h1>Implements examples adapted from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/decrypt.</h1>
+
+
+@code {
+    // TODO: add an interface to allow user interaction instead of hardcoded data.
+
+    /// <summary>
+    /// AES-GCM.
+    /// </summary>
+    /// <param name="key">AES key to use.</param>
+    /// <returns></returns>
+    private async Task<byte[]?>
+    AesGcm(CryptoKeyDescriptor key, byte[] ciphertext, byte[] iv)
+    {
+        await using AesGcm? gcm = this._aesFactory.Create<AesGcm>(key);
+        if (gcm is not null)
+        {
+            return await gcm.Decrypt(ciphertext, iv);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// AES-CTR.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    private async Task<byte[]?>
+    AesCtr(CryptoKeyDescriptor key, byte[] ciphertext, byte[] counter, int length)
+    {
+        await using AesCtr? ctr = this._aesFactory.Create<AesCtr>(key);
+        if (ctr is not null)
+        {
+            return await ctr.Decrypt(ciphertext, counter, length);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// AES-CBC.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    private async Task<byte[]?>
+    AesCbc(CryptoKeyDescriptor key, byte[] ciphertext, byte[] iv)
+    {
+        await using AesCbc? cbc = this._aesFactory.Create<AesCbc>(key);
+        if (cbc is not null)
+        {
+            return await cbc.Decrypt(ciphertext, iv);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// RSA-OAEP.
+    /// </summary>
+    /// <param name="keyPair"></param>
+    /// <returns></returns>
+    private async Task<byte[]?>
+    RsaOaep(CryptoKeyPairDescriptor keyPair, byte[] ciphertext)
+    {
+        await using RsaOaep? oaep = this._rsaFactory.Create<RsaOaep>(keyPair);
+        if (oaep is not null)
+        {
+            return await oaep.Decrypt(ciphertext);
+        }
+
+        return null;
+    }
+
+}

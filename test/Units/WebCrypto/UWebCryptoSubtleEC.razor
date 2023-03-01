@@ -1,0 +1,244 @@
+﻿@using JSInterop.Browser.TestApp.Units
+
+@using JSInterop.Browser.WebCryptoAPI.JSHelpers
+@using JSInterop.Browser.WebCryptoAPI.Interfaces
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.EC
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.AES
+
+@inject Crypto _crypto
+
+<div id="main">
+
+    <UnitTest TestName="EC generateKey"
+              MethodToBeTested="@this.GenerateKey" />
+
+    <UnitTest TestName="EC exportKey"
+              MethodToBeTested="@this.ExportKey" />
+
+    <UnitTest TestName="ECDSA sign/verify"
+              MethodToBeTested="@this.SignVerify" />
+
+    <UnitTest TestName="ECDH derive key"
+              MethodToBeTested="@this.DeriveKey" />
+
+    <UnitTest TestName="ECDH derive bits"
+              MethodToBeTested="@this.DeriveBits" />
+
+</div>
+
+
+@code {
+    private byte[] _data1;
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public UWebCryptoSubtleEC()
+    {
+        this._data1 = new byte[] { 1, 2, 3 };
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    GenerateKey()
+    {
+        EcKeyGenParams gen = new(EcAlgorithm.ECDSA, EcNamedCurve.P_384);
+
+        JSResultValue<CryptoKeyPairDescriptor> res = await this._crypto.Subtle.GenerateKeyPair(
+            gen,
+            false,
+            CryptoKeyUsage.Sign | CryptoKeyUsage.Verify);
+
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        gen = new(EcAlgorithm.ECDH, EcNamedCurve.P_521);
+        res = await this._crypto.Subtle.GenerateKeyPair(
+            gen,
+            false,
+            CryptoKeyUsage.DeriveKey | CryptoKeyUsage.DeriveBits);
+
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    ExportKey()
+    {
+        EcKeyGenParams gen = new(EcAlgorithm.ECDSA, EcNamedCurve.P_384);
+
+        JSResultValue<CryptoKeyPairDescriptor> res = await this._crypto.Subtle.GenerateKeyPair(
+            gen,
+            true,
+            CryptoKeyUsage.Sign | CryptoKeyUsage.Verify);
+
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        CryptoKeyPairDescriptor ckp = res.GetValueOrThrow();
+        if (ckp.PublicKey is null || ckp.PrivateKey is null)
+        {
+            return UnitTestResult.Failed("Keys are missing.");
+        }
+
+        JSResultValue<byte[]> exportPubRes = await this._crypto.Subtle.ExportKey(
+            CryptoKeyFormat.SubjectPublicKeyInfo,
+            ckp.PublicKey);
+
+        if (!exportPubRes)
+        {
+            return UnitTestResult.Failed(exportPubRes.Error?.Message);
+        }
+
+        JSResultValue<byte[]> exportPrvRes = await this._crypto.Subtle.ExportKey(
+            CryptoKeyFormat.PKCS8,
+            ckp.PrivateKey);
+        if (!exportPrvRes)
+        {
+            return UnitTestResult.Failed(exportPrvRes.Error?.Message);
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    SignVerify()
+    {
+        EcKeyGenParams gen = new(EcAlgorithm.ECDSA, EcNamedCurve.P_384);
+        EcdsaParams prs = new(ShaAlgorithm.SHA256);
+
+        return await UWebCryptoCommon.SignVerify(this._crypto, gen, prs, prs);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    DeriveKey()
+    {
+        EcKeyGenParams gen1 = new(EcAlgorithm.ECDH, EcNamedCurve.P_256);
+        EcKeyGenParams gen2 = new(EcAlgorithm.ECDH, EcNamedCurve.P_256);
+
+        JSResultValue<CryptoKeyPairDescriptor> res1 = await this._crypto.Subtle.GenerateKeyPair(
+            gen1,
+            false,
+            CryptoKeyUsage.DeriveKey | CryptoKeyUsage.DeriveBits);
+
+        JSResultValue<CryptoKeyPairDescriptor> res2 = await this._crypto.Subtle.GenerateKeyPair(
+            gen2,
+            false,
+            CryptoKeyUsage.DeriveKey | CryptoKeyUsage.DeriveBits);
+
+        if (!res1 || !res2)
+        {
+            return UnitTestResult.Failed(res1.Error?.Message);
+        }
+
+        CryptoKeyPairDescriptor ck1 = res1.GetValueOrThrow();
+        CryptoKeyPairDescriptor ck2 = res2.GetValueOrThrow();
+
+        AesKeyGenParams secretPrs = new(AesAlgorithm.GCM, 256);
+
+        // alice(1) - bob(2)
+        // Derive secret for 1.
+        JSResultValue<CryptoKeyDescriptor> secretRes1 = await this._crypto.Subtle.DeriveKey(
+            new EcdhKeyDeriveParams(ck2.GetPublicKeyOrThrow()),
+            ck1.GetPrivateKeyOrThrow(),
+            secretPrs,
+            true,
+            CryptoKeyUsage.Encrypt | CryptoKeyUsage.Decrypt);
+
+        if (!secretRes1)
+        {
+            return UnitTestResult.Failed(secretRes1.Error?.Message);
+        }
+
+        // Derive secret for 2.
+        JSResultValue<CryptoKeyDescriptor> secretRes2 = await this._crypto.Subtle.DeriveKey(
+            new EcdhKeyDeriveParams(ck1.GetPublicKeyOrThrow()),
+            ck2.GetPrivateKeyOrThrow(),
+            secretPrs,
+            false,
+            CryptoKeyUsage.Encrypt | CryptoKeyUsage.Decrypt);
+
+        if (!secretRes2)
+        {
+            return UnitTestResult.Failed(secretRes2.Error?.Message);
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    DeriveBits()
+    {
+        EcKeyGenParams gen1 = new(EcAlgorithm.ECDH, EcNamedCurve.P_256);
+        EcKeyGenParams gen2 = new(EcAlgorithm.ECDH, EcNamedCurve.P_256);
+
+        JSResultValue<CryptoKeyPairDescriptor> res1 = await this._crypto.Subtle.GenerateKeyPair(
+            gen1,
+            false,
+            CryptoKeyUsage.DeriveKey | CryptoKeyUsage.DeriveBits);
+
+        JSResultValue<CryptoKeyPairDescriptor> res2 = await this._crypto.Subtle.GenerateKeyPair(
+            gen2,
+            false,
+            CryptoKeyUsage.DeriveKey | CryptoKeyUsage.DeriveBits);
+
+        if (!res1 || !res2)
+        {
+            return UnitTestResult.Failed(res1.Error?.Message);
+        }
+
+        CryptoKeyPairDescriptor ck1 = res1.GetValueOrThrow();
+        CryptoKeyPairDescriptor ck2 = res2.GetValueOrThrow();
+
+        AesKeyGenParams secretPrs = new(AesAlgorithm.GCM, 256);
+
+        // alice(1) - bob(2)
+        // Derive secret for 1.
+        JSResultValue<byte[]> secretRes1 = await this._crypto.Subtle.DeriveBits(
+            new EcdhKeyDeriveParams(ck2.GetPublicKeyOrThrow()),
+            ck1.GetPrivateKeyOrThrow(),
+            128);
+
+        // Derive secret for 2.
+        JSResultValue<byte[]> secretRes2 = await this._crypto.Subtle.DeriveBits(
+            new EcdhKeyDeriveParams(ck1.GetPublicKeyOrThrow()),
+            ck2.GetPrivateKeyOrThrow(),
+            128);
+
+        if (!secretRes1 || !secretRes2)
+        {
+            return UnitTestResult.Failed(secretRes1.Error?.Message);
+        }
+
+        return UnitTestResult.Passed();
+    }
+}

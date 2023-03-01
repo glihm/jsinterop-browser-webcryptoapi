@@ -1,0 +1,196 @@
+﻿@using JSInterop.Browser.TestApp.Units
+
+@using JSInterop.Browser.WebCryptoAPI.JSHelpers
+@using JSInterop.Browser.WebCryptoAPI.Interfaces
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.HMAC
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.AES
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.DF
+
+@inject Crypto _crypto
+
+<div id="main">
+
+    <UnitTest TestName="HKDF derive key"
+              MethodToBeTested="@this.HkdfDeriveKey" />
+
+    <UnitTest TestName="HKDF derive bits"
+              MethodToBeTested="@this.HkdfDeriveBits" />
+
+    <UnitTest TestName="PBKDF2 derive key"
+              MethodToBeTested="@this.Pbkdf2DeriveKey" />
+
+    <UnitTest TestName="PBKDF2 derive bits"
+              MethodToBeTested="@this.Pbkdf2DeriveBits" />
+
+</div>
+
+
+@code {
+    private byte[] _data1;
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public UWebCryptoSubtleDF()
+    {
+        this._data1 = new byte[] { 1, 2, 3 };
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    HkdfDeriveKey()
+    {
+        byte[] password = new byte[] { 1, 2, 3 };
+
+        JSResultValue<CryptoKeyDescriptor> importRes = await this._crypto.Subtle.ImportKey(
+            CryptoKeyFormat.Raw,
+            password,
+            new HkdfImportParams(),
+            false,
+            CryptoKeyUsage.DeriveKey | CryptoKeyUsage.DeriveBits
+        );
+
+        if (!importRes)
+        {
+            return UnitTestResult.Failed(importRes.Error?.Message);
+        }
+
+        HkdfParams prs = new(ShaAlgorithm.SHA256, new byte[] { 1, 2, 3 });
+        AesKeyGenParams derivedPrs = new(AesAlgorithm.GCM, 256);
+
+        JSResultValue<CryptoKeyDescriptor> res = await this._crypto.Subtle.DeriveKey(
+            prs,
+            importRes.GetValueOrThrow(),
+            derivedPrs,
+            false,
+            CryptoKeyUsage.Encrypt | CryptoKeyUsage.Decrypt);
+
+        if (!res)
+        {
+            UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    Pbkdf2DeriveKey()
+    {
+        byte[] password = new byte[] { 1, 2, 3 };
+
+        JSResultValue<CryptoKeyDescriptor> importRes = await this._crypto.Subtle.ImportKey(
+            CryptoKeyFormat.Raw,
+            password,
+            new Pbkdf2ImportParams(),
+            false,
+            CryptoKeyUsage.DeriveKey | CryptoKeyUsage.DeriveBits);
+
+        if (!importRes)
+        {
+            return UnitTestResult.Failed(importRes.Error?.Message);
+        }
+
+        Pbkdf2Params prs = new(ShaAlgorithm.SHA256, new byte[] { 1, 2, 3 }, 1000);
+        HmacKeyGenParams derivedPrs = new(ShaAlgorithm.SHA256);
+
+        JSResultValue<CryptoKeyDescriptor> res = await this._crypto.Subtle.DeriveKey(
+            prs,
+            importRes.GetValueOrThrow(),
+            derivedPrs,
+            false,
+            CryptoKeyUsage.Sign | CryptoKeyUsage.Verify);
+
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    HkdfDeriveBits()
+    {
+        byte[] password = new byte[] { 1, 2, 3 };
+
+        JSResultValue<CryptoKeyDescriptor> importRes = await this._crypto.Subtle.ImportKey(
+            CryptoKeyFormat.Raw,
+            password,
+            new HkdfImportParams(),
+            false,
+            CryptoKeyUsage.DeriveKey | CryptoKeyUsage.DeriveBits
+        );
+
+        if (!importRes)
+        {
+            return UnitTestResult.Failed(importRes.Error?.Message);
+        }
+
+        HkdfParams prs = new(ShaAlgorithm.SHA256, new byte[] { 1, 2, 3 });
+
+        JSResultValue<byte[]> res = await this._crypto.Subtle.DeriveBits(
+            prs,
+            importRes.GetValueOrThrow(),
+            16);
+
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    Pbkdf2DeriveBits()
+    {
+        byte[] password = new byte[] { 1, 2, 3 };
+
+        JSResultValue<CryptoKeyDescriptor> importRes = await this._crypto.Subtle.ImportKey(
+            CryptoKeyFormat.Raw,
+            password,
+            new Pbkdf2ImportParams(),
+            false,
+            CryptoKeyUsage.DeriveKey | CryptoKeyUsage.DeriveBits);
+
+        if (!importRes)
+        {
+            return UnitTestResult.Failed(importRes.Error?.Message);
+        }
+
+        Pbkdf2Params prs = new(ShaAlgorithm.SHA256, new byte[] { 1, 2, 3 }, 1000);
+
+        JSResultValue<byte[]> res = await this._crypto.Subtle.DeriveBits(
+            prs,
+            importRes.GetValueOrThrow(),
+            16);
+
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+
+
+
+}

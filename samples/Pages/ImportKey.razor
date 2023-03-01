@@ -1,0 +1,130 @@
+﻿@page "/importKey"
+
+@using JSInterop.Browser.WebCryptoAPI.JSHelpers
+@using JSInterop.Browser.WebCryptoAPI.Interfaces
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.RSA
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.EC
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.AES
+
+@using JSInterop.Browser.WebCryptoAPI.Cryptography
+
+@inject Crypto _crypto
+
+
+<PageTitle>ImportKey</PageTitle>
+
+<h1>Implements examples adapted from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey.</h1>
+
+
+@code {
+    // TODO: add an interface to allow user interaction instead of hardcoded data.
+
+
+    /// <summary>
+    /// Raw.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    private async Task<CryptoKeyDescriptor?>
+    Raw(byte[] key)
+    {
+        JSResultValue<CryptoKeyDescriptor> res = await this._crypto.Subtle.ImportKey(
+            CryptoKeyFormat.Raw,
+            key,
+            new AesImportParams(AesAlgorithm.GCM),
+            true,
+            CryptoKeyUsage.Encrypt | CryptoKeyUsage.Decrypt);
+
+        if (!res)
+        {
+            return null;
+        }
+
+        return res.GetValueOrThrow();
+    }
+
+    /// <summary>
+    /// PKCS8.
+    /// </summary>
+    /// <param name="key</param>
+    /// <returns></returns>
+    private async Task<CryptoKeyDescriptor?>
+    Pkcs8(string pem)
+    {
+        byte[]? key = PemHelper.KeyExtract(pem);
+        if (key is null)
+        {
+            return null;
+        }
+
+        JSResultValue<CryptoKeyDescriptor> res = await this._crypto.Subtle.ImportKey(
+            CryptoKeyFormat.PKCS8,
+            key,
+            new RsaHashedImportParams(RsaAlgorithm.PSS, ShaAlgorithm.SHA256),
+            true,
+            CryptoKeyUsage.Sign);
+
+        if (!res)
+        {
+            return null;
+        }
+
+        return res.GetValueOrThrow();
+    }
+
+    /// <summary>
+    /// SPKI.
+    /// </summary>
+    /// <param name="pem"></param>
+    /// <returns></returns>
+    private async Task<CryptoKeyDescriptor?>
+    Spki(string pem)
+    {
+        byte[]? key = PemHelper.KeyExtract(pem);
+        if (key is null)
+        {
+            return null;
+        }
+
+        JSResultValue<CryptoKeyDescriptor> res = await this._crypto.Subtle.ImportKey(
+            CryptoKeyFormat.SubjectPublicKeyInfo,
+            key,
+            new RsaHashedImportParams(RsaAlgorithm.OAEP, ShaAlgorithm.SHA256),
+            true,
+            CryptoKeyUsage.Encrypt);
+
+        if (!res)
+        {
+            return null;
+        }
+
+        return res.GetValueOrThrow();
+    }
+
+    /// <summary>
+    /// JSONWebKey.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    private async Task<CryptoKeyDescriptor?>
+    JsonWebKey(string key)
+    {
+        JSResultValue<CryptoKeyDescriptor> res = await this._crypto.Subtle.ImportKey(
+            CryptoKeyFormat.JSONWebKey,
+            key,
+            new EcKeyImportParams(EcAlgorithm.ECDSA, EcNamedCurve.P_384),
+            true,
+            CryptoKeyUsage.Sign);
+
+        if (!res)
+        {
+            return null;
+        }
+
+        return res.GetValueOrThrow();
+    }
+  
+}

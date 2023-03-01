@@ -1,0 +1,318 @@
+﻿@using JSInterop.Browser.TestApp.Units
+
+@using JSInterop.Browser.WebCryptoAPI.JSHelpers
+@using JSInterop.Browser.WebCryptoAPI.Interfaces
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys
+@using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.AES
+
+@inject Crypto _crypto
+
+<div id="main">
+
+    <UnitTest TestName="AES generateKey"
+              MethodToBeTested="@this.GenerateKey" />
+
+    <UnitTest TestName="AES importKey"
+              MethodToBeTested="@this.ImportKey" />
+
+    <UnitTest TestName="AES exportKey"
+              MethodToBeTested="@this.ExportKey" />
+
+    <UnitTest TestName="AES exportKeyJSONWebKey"
+              MethodToBeTested="@this.ExportKeyJSONWebKey" />
+
+    <UnitTest TestName="AES GCM encrypt/decrypt"
+              MethodToBeTested="@this.EncryptDecryptGCM" />
+
+    <UnitTest TestName="AES CTR encrypt/decrypt"
+              MethodToBeTested="@this.EncryptDecryptCTR" />
+
+    <UnitTest TestName="AES CBC encrypt/decrypt"
+              MethodToBeTested="@this.EncryptDecryptCBC" />
+
+    <UnitTest TestName="AES WrapUnwrap"
+              MethodToBeTested="@this.WrapUnwrap" />
+</div>
+
+
+@code {
+    private byte[] _data1;
+    private byte[] _iv1;
+    private byte[] _iv2;
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public UWebCryptoSubtleAES()
+    {
+        this._data1 = new byte[] { 1, 2, 3 };
+        this._iv1 = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        this._iv2 = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    GenerateKey()
+    {
+        AesKeyGenParams gen = new(AesAlgorithm.GCM, 256);
+
+        JSResultValue<CryptoKeyDescriptor> res = await this._crypto.Subtle.GenerateKey(
+            gen,
+            false,
+            CryptoKeyUsage.Encrypt | CryptoKeyUsage.Decrypt);
+
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        gen = new(AesAlgorithm.CTR, 256);
+        res = await this._crypto.Subtle.GenerateKey(
+            gen,
+            false,
+            CryptoKeyUsage.Encrypt | CryptoKeyUsage.Decrypt);
+
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        gen = new(AesAlgorithm.CBC, 256);
+        res = await this._crypto.Subtle.GenerateKey(
+            gen,
+            false,
+            CryptoKeyUsage.Encrypt | CryptoKeyUsage.Decrypt);
+
+        if (!res)
+        {
+            return UnitTestResult.Failed(res.Error?.Message);
+        }
+
+        // Test for deletion. TODO: move this to an other test more generic.
+        JSResultVoid delRes = await this._crypto.Subtle.DeleteKey(res.GetValueOrThrow());
+        if (!delRes)
+        {
+            return UnitTestResult.Failed(delRes.Error?.Message);
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    ImportKey()
+    {
+        byte[] aesKey = new byte[32];
+        await this._crypto.GetRandomValues(aesKey);
+
+        AesImportParams prs = new(AesAlgorithm.GCM);
+
+        JSResultValue<CryptoKeyDescriptor> importRes = await this._crypto.Subtle.ImportKey(
+            CryptoKeyFormat.Raw,
+            aesKey,
+            prs,
+            false,
+            CryptoKeyUsage.Encrypt | CryptoKeyUsage.Decrypt
+        );
+
+        await this._crypto.Subtle.DumpKeys();
+
+        if (!importRes)
+        {
+            return UnitTestResult.Failed(importRes.Error?.Message);
+        }
+
+        CryptoKeyDescriptor ck = importRes.GetValueOrThrow();
+        AesGcmParams prs2 = new(this._iv1);
+
+        return await UWebCryptoCommon.EncryptDecrypt(this._crypto, ck, prs2, prs2);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    ExportKey()
+    {
+        byte[] aesKey = new byte[32];
+        await this._crypto.GetRandomValues(aesKey);
+
+        AesImportParams prs = new(AesAlgorithm.GCM);
+
+        JSResultValue<CryptoKeyDescriptor> importRes = await this._crypto.Subtle.ImportKey(
+            CryptoKeyFormat.Raw,
+            aesKey,
+            prs,
+            true,
+            CryptoKeyUsage.Encrypt | CryptoKeyUsage.Decrypt
+        );
+
+        await this._crypto.Subtle.DumpKeys();
+
+        if (!importRes)
+        {
+            return UnitTestResult.Failed(importRes.Error?.Message);
+        }
+
+        CryptoKeyDescriptor ck = importRes.GetValueOrThrow();
+
+        JSResultValue<byte[]> rawKeyRes = await this._crypto.Subtle.ExportKey(
+            CryptoKeyFormat.Raw,
+            ck);
+
+        if (!rawKeyRes)
+        {
+            return UnitTestResult.Failed(rawKeyRes.Error?.Message);
+        }
+
+        return rawKeyRes.GetValueOrThrow().SequenceEqual(aesKey) ? UnitTestResult.Passed() :
+                                                                   UnitTestResult.Failed("Exported key differs from imported key.");
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    ExportKeyJSONWebKey()
+    {
+        byte[] aesKey = new byte[32];
+        await this._crypto.GetRandomValues(aesKey);
+
+        AesImportParams prs = new(AesAlgorithm.GCM);
+
+        JSResultValue<CryptoKeyDescriptor> importRes = await this._crypto.Subtle.ImportKey(
+            CryptoKeyFormat.Raw,
+            aesKey,
+            prs,
+            true,
+            CryptoKeyUsage.Encrypt | CryptoKeyUsage.Decrypt
+        );
+
+        await this._crypto.Subtle.DumpKeys();
+
+        if (!importRes)
+        {
+            return UnitTestResult.Failed(importRes.Error?.Message);
+        }
+
+        CryptoKeyDescriptor ck = importRes.GetValueOrThrow();
+
+        JSResultValue<String> jwkRes = await this._crypto.Subtle.ExportKeyJSONWebKey(ck);
+
+        if (!jwkRes)
+        {
+            return UnitTestResult.Failed(jwkRes.Error?.Message);
+        }
+
+        String jwk = jwkRes.GetValueOrThrow();
+        return !String.IsNullOrEmpty(jwk) ? UnitTestResult.Passed() :
+                                            UnitTestResult.Failed("JSONWebKey is null or emtpy.");
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    EncryptDecryptGCM()
+    {
+        AesKeyGenParams gen = new(AesAlgorithm.GCM, 256);
+        AesGcmParams prs = new(this._iv1);
+
+        return await UWebCryptoCommon.EncryptDecrypt(this._crypto, gen, prs, prs);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    EncryptDecryptCTR()
+    {
+        AesKeyGenParams gen = new(AesAlgorithm.CTR, 256);
+
+        byte[] counter = new byte[16];
+        await this._crypto.GetRandomValues(counter);
+
+        AesCtrParams prs = new(counter, length: 64);
+
+        return await UWebCryptoCommon.EncryptDecrypt(this._crypto, gen, prs, prs);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    EncryptDecryptCBC()
+    {
+        AesKeyGenParams gen = new(AesAlgorithm.CBC, 256);
+        AesCbcParams prs = new(this._iv2);
+        return await UWebCryptoCommon.EncryptDecrypt(this._crypto, gen, prs, prs);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    private async Task<UnitTestResult>
+    WrapUnwrap()
+    {
+        AesKeyGenParams genWrap = new(AesAlgorithm.CBC, 256);
+        AesKeyGenParams genWrapping = new(AesAlgorithm.KW, 256);
+
+        JSResultValue<CryptoKeyDescriptor> resGenWrap = await this._crypto.Subtle.GenerateKey(
+            genWrap,
+            true,
+            CryptoKeyUsage.Encrypt | CryptoKeyUsage.Decrypt);
+
+        JSResultValue<CryptoKeyDescriptor> resGenWrapping = await this._crypto.Subtle.GenerateKey(
+            genWrapping,
+            false,
+            CryptoKeyUsage.WrapKey | CryptoKeyUsage.UnwrapKey);
+
+        if(!resGenWrap || !resGenWrapping)
+        {
+            return UnitTestResult.Failed("gen keys failed.");
+        }
+
+        CryptoKeyDescriptor wrapKey = resGenWrap.GetValueOrThrow();
+        CryptoKeyDescriptor wrappingKey = resGenWrapping.GetValueOrThrow();
+
+        JSResultValue<byte[]> resWrap = await this._crypto.Subtle.WrapKey(
+            CryptoKeyFormat.Raw,
+            wrapKey,
+            wrappingKey,
+            new AesKwParams());
+        if (!resWrap)
+        {
+            return UnitTestResult.Failed(resWrap.Error?.Message);
+        }
+
+
+        JSResultValue<CryptoKeyDescriptor> resUnwrap = await this._crypto.Subtle.UnwrapKey(
+            CryptoKeyFormat.Raw,
+            resWrap.GetValueOrThrow(),
+            wrappingKey,
+            new AesKwParams(),
+            new AesImportParams(AesAlgorithm.GCM),
+            false,
+            CryptoKeyUsage.Encrypt);
+
+        if (!resUnwrap)
+        {
+            return UnitTestResult.Failed(resUnwrap.Error?.Message);
+        }
+
+        return UnitTestResult.Passed();
+    }
+
+}

@@ -1,0 +1,28 @@
+﻿#main {
+    display: flex;
+    justify-content: space-between;
+    width: 50%;
+    margin: auto;
+}
+
+.test-spinner {
+    width: 15px;
+    height: 15px;
+    margin: 0;
+}
+
+#test-name {
+    margin: 0;
+}
+
+#test-result {
+    margin: 0;
+}
+
+.success {
+    color: green;
+}
+
+.error {
+    color: red;
+}
