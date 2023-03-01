@@ -24,7 +24,7 @@ can be retrieved safely after checking the `JSResult` validity.
 
 For example:
 
-```
+```csharp
 JSResultValue<CryptoKey> res = await this._crypto.Subtle.GenerateKey(....);
 if (!res)
 {
