@@ -1,4 +1,4 @@
-﻿# JSInterop.Browser.WebCryptoAPI
+# JSInterop.Browser.WebCryptoAPI
 
 A convenient way to use browser cryptography from `C#`.
 
@@ -123,6 +123,10 @@ You can find a `.editorconfig` file with the configuration I generated with VS s
 I am personally using other editors, but please let me know if you have issue with it.
 
 Even if I try to be as consistent as I can, don't hesitate to report any issue.
+
+## Library as a package
+
+You can find the package on [NuGet](https://www.nuget.org/packages/JSInterop.Browser.WebCryptoAPI/).
 
 
 ## TODO
