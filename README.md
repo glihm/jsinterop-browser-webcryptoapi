@@ -34,6 +34,8 @@ The two main namespaces of the library are:
 * `interfaces`: low-level `C#` classes close to the Web Cryptography API interfaces.
 * `cryptography`: high-level `C#` classes that are use to abstract the implementation details of the Web Cryptography API.
 
+Samples of code will be added progressively into the `samples` project, where the folder `Pages` will contains the actual code.
+
 > Caution: at the moment, this library was only tested with `Blazor WASM`)
 
 With `cryptography` namespace, you can encrypt data with `AES` like this:
