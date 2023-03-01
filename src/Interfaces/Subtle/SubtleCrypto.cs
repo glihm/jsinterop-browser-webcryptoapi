@@ -453,10 +453,10 @@ public class SubtleCrypto : JSModule
     {
 #if DEBUG
         string fn = "dumpKeys";
+#else
+        string fn = "";
+#endif
         return await this.ModuleInvokeVoidAsync(fn)
                          .ConfigureAwait(false);
-#else
-        return new JSResultVoid();
-#endif
     }
 }
