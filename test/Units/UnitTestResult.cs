@@ -1,4 +1,4 @@
-﻿namespace JSInterop.Browser.TestApp.Units;
+﻿namespace TestApp.Units;
 
 /// <summary>
 /// 

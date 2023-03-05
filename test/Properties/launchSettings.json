@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "JSInterop.Browser.TestApp": {
+    "TestApp": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,

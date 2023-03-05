@@ -1,4 +1,4 @@
-# JSInterop.Browser.WebCryptoAPI
+# Glihm.JSInterop.Browser.WebCryptoAPI
 
 A convenient way to use browser cryptography from `C#`.
 
@@ -44,7 +44,7 @@ With `cryptography` namespace, you can encrypt data with `AES` like this:
 ```csharp
 // Program.cs
 
-using JSInterop.Browser.WebCryptoAPI.Cryptography.AES;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.AES;
 
 ...
 
@@ -55,7 +55,7 @@ builder.Services.AddWebCryptoAes();
 ```csharp
 // BlazorComponent.razor
 
-@using JSInterop.Browser.WebCryptoAPI.Cryptography.AES
+@using Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.AES
 @inject AesFactory _aesFactory
 
 ...
@@ -128,7 +128,7 @@ Even if I try to be as consistent as I can, don't hesitate to report any issue.
 
 ## Library as a package
 
-You can find the package on [NuGet](https://www.nuget.org/packages/JSInterop.Browser.WebCryptoAPI/).
+You can find the package on [NuGet](https://www.nuget.org/packages/Glihm.JSInterop.Browser.WebCryptoAPI/).
 
 
 ## TODO

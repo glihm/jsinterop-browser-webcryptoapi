@@ -1,10 +1,11 @@
-using JSInterop.Browser.TestApp;
-using JSInterop.Browser.WebCryptoAPI.Interfaces;
-using JSInterop.Browser.WebCryptoAPI.Cryptography.AES;
-using JSInterop.Browser.WebCryptoAPI.Cryptography.RSA;
-using JSInterop.Browser.WebCryptoAPI.Cryptography.EC;
-using JSInterop.Browser.WebCryptoAPI.Cryptography.HMAC;
-using JSInterop.Browser.WebCryptoAPI.Cryptography.Random;
+using TestApp;
+
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.AES;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.RSA;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.EC;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.HMAC;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.Random;
 
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;

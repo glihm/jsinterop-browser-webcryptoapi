@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.Params;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.Params;
 
-namespace JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.AES;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.AES;
 
 /// <summary>
 /// AES-GCM parameters.

@@ -1,4 +1,4 @@
-﻿namespace JSInterop.Browser.WebCryptoAPI.Cryptography;
+﻿namespace Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography;
 
 public class CryptoKeyPairImport
 {

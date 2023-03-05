@@ -1,9 +1,9 @@
-using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle;
-using JSInterop.Browser.WebCryptoAPI.JSHelpers;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle;
+using Glihm.JSInterop.Browser.WebCryptoAPI.JSHelpers;
 
 using Microsoft.JSInterop;
 
-namespace JSInterop.Browser.WebCryptoAPI.Interfaces;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces;
 
 /// <summary>
 /// Crypto interface.
@@ -22,7 +22,7 @@ public class Crypto : JSModule
     /// </summary>
     /// <param name="jsRuntime"></param>
     public Crypto(IJSRuntime jsRuntime)
-        : base(jsRuntime, "./_content/JSInterop.Browser.WebCryptoAPI/Crypto.js")
+        : base(jsRuntime, "./_content/Glihm.JSInterop.Browser.WebCryptoAPI/Crypto.js")
     {
         this.Subtle = new(jsRuntime);
     }

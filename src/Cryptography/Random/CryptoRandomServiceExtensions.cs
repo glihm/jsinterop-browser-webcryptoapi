@@ -1,8 +1,8 @@
-﻿using JSInterop.Browser.WebCryptoAPI.Interfaces;
+﻿using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces;
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace JSInterop.Browser.WebCryptoAPI.Cryptography.Random;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.Random;
 
 /// <summary>
 /// IServiceCollection extensions.

@@ -1,6 +1,6 @@
 ﻿using Microsoft.JSInterop;
 
-namespace JSInterop.Browser.WebCryptoAPI.JSHelpers;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.JSHelpers;
 
 /// <summary>
 /// Base class to bind JS module to a C# class.

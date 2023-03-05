@@ -1,6 +1,6 @@
 ﻿using Microsoft.JSInterop;
 
-namespace JSInterop.Browser.WebCryptoAPI.JSHelpers;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.JSHelpers;
 
 /// <summary>
 /// Represents a result with an attached value.

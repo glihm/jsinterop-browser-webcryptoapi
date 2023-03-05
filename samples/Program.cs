@@ -1,12 +1,12 @@
-using JSInterop.Browser.Samples;
+using Samples;
 
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
-using JSInterop.Browser.WebCryptoAPI.Cryptography.Random;
-using JSInterop.Browser.WebCryptoAPI.Cryptography.AES;
-using JSInterop.Browser.WebCryptoAPI.Cryptography.RSA;
-using JSInterop.Browser.WebCryptoAPI.Interfaces;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.Random;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.AES;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.RSA;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

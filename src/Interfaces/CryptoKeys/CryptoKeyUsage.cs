@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
 
 /// <summary>
 /// CryptoKey's usages.

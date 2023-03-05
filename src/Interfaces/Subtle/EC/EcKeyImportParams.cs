@@ -1,6 +1,6 @@
-﻿using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.Params;
+﻿using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.Params;
 
-namespace JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.EC;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.EC;
 
 /// <summary>
 /// EC import params.

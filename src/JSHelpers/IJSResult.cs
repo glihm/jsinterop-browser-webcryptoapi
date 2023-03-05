@@ -1,6 +1,6 @@
 ﻿using Microsoft.JSInterop;
 
-namespace JSInterop.Browser.WebCryptoAPI.JSHelpers;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.JSHelpers;
 
 /// <summary>
 /// Basic contract for a IJSResult to be fullfilled.

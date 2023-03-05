@@ -1,7 +1,7 @@
-﻿using JSInterop.Browser.WebCryptoAPI.Interfaces;
-using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
+﻿using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
 
-namespace JSInterop.Browser.WebCryptoAPI.Cryptography.EC;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.EC;
 
 /// <summary>
 /// Base class to factorize common functionalities

@@ -1,9 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 
-using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.Params;
-using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.Params;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA;
 
-namespace JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.DF;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.DF;
 
 /// <summary>
 /// PBKDF2 params.

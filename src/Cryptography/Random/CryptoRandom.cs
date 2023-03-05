@@ -1,9 +1,9 @@
-﻿using JSInterop.Browser.WebCryptoAPI.Interfaces;
-using JSInterop.Browser.WebCryptoAPI.JSHelpers;
+﻿using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces;
+using Glihm.JSInterop.Browser.WebCryptoAPI.JSHelpers;
 
 using Microsoft.Extensions.Logging;
 
-namespace JSInterop.Browser.WebCryptoAPI.Cryptography.Random;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.Random;
 
 public class CryptoRandom
 {

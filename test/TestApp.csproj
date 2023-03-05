@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\JSInterop.Browser.WebCryptoAPI.csproj" />
+    <ProjectReference Include="..\src\Glihm.JSInterop.Browser.WebCryptoAPI.csproj" />
   </ItemGroup>
 
 </Project>

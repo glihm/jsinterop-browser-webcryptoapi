@@ -1,9 +1,9 @@
 ﻿using System.Text;
 
-using JSInterop.Browser.WebCryptoAPI.Interfaces;
-using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
 
-namespace JSInterop.Browser.WebCryptoAPI.Cryptography;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography;
 
 /// <summary>
 /// Base for cryptography classes that will handle

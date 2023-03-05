@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.AES;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.AES;
 
 /// <summary>
 /// AES modes of operation, mapped to Algorithm

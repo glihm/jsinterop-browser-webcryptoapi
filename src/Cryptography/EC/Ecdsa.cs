@@ -1,12 +1,12 @@
-﻿using JSInterop.Browser.WebCryptoAPI.Interfaces;
-using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
-using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.EC;
-using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA;
-using JSInterop.Browser.WebCryptoAPI.JSHelpers;
+﻿using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.EC;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA;
+using Glihm.JSInterop.Browser.WebCryptoAPI.JSHelpers;
 
 using Microsoft.Extensions.Logging;
 
-namespace JSInterop.Browser.WebCryptoAPI.Cryptography.EC;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.EC;
 
 /// <summary>
 /// ECDSA.

@@ -1,9 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 
-using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle;
-using JSInterop.Browser.WebCryptoAPI.JSHelpers;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle;
+using Glihm.JSInterop.Browser.WebCryptoAPI.JSHelpers;
 
-namespace JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
 
 /// <summary>
 /// C# representation of a CryptoKey.

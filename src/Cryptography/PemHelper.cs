@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace JSInterop.Browser.WebCryptoAPI.Cryptography;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography;
 
 /// <summary>
 /// PEM format helper.

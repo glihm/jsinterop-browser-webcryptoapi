@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.EC;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.EC;
 
 /// <summary>
 /// EC named curves.

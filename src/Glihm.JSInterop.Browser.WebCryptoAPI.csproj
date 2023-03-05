@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>JSInterop.Browser.WebCryptoAPI</RootNamespace>
+    <RootNamespace>Glihm.JSInterop.Browser.WebCryptoAPI</RootNamespace>
     <Version>1.0.1</Version>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/glihm/jsinterop-browser-webcryptoapi</RepositoryUrl>

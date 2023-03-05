@@ -1,11 +1,11 @@
-﻿using JSInterop.Browser.WebCryptoAPI.Interfaces;
-using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
-using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.HMAC;
-using JSInterop.Browser.WebCryptoAPI.JSHelpers;
+﻿using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.HMAC;
+using Glihm.JSInterop.Browser.WebCryptoAPI.JSHelpers;
 
 using Microsoft.Extensions.Logging;
 
-namespace JSInterop.Browser.WebCryptoAPI.Cryptography.HMAC;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography.HMAC;
 
 /// <summary>
 /// HMAC.

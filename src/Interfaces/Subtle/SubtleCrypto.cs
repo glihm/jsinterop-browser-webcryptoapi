@@ -1,11 +1,11 @@
-using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
-using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.Params;
-using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA;
-using JSInterop.Browser.WebCryptoAPI.JSHelpers;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.Params;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA;
+using Glihm.JSInterop.Browser.WebCryptoAPI.JSHelpers;
 
 using Microsoft.JSInterop;
 
-namespace JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle;
 
 /// <summary>
 /// Implements Web Crypto API Subtle.
@@ -22,7 +22,7 @@ public class SubtleCrypto : JSModule
     /// </summary>
     /// <param name="jsRuntime"></param>
     public SubtleCrypto(IJSRuntime jsRuntime)
-        : base(jsRuntime, "./_content/JSInterop.Browser.WebCryptoAPI/SubtleCrypto.js")
+        : base(jsRuntime, "./_content/Glihm.JSInterop.Browser.WebCryptoAPI/SubtleCrypto.js")
     {
     }
 

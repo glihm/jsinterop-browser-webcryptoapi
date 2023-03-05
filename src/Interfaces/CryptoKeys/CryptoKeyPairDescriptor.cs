@@ -1,4 +1,4 @@
-﻿namespace JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
+﻿namespace Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
 
 /// <summary>
 /// A convenient way to group public and private key

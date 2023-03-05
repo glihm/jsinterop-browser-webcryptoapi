@@ -1,10 +1,10 @@
-﻿using JSInterop.Browser.WebCryptoAPI.Cryptography;
-using JSInterop.Browser.WebCryptoAPI.Interfaces;
-using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
-using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.Params;
-using JSInterop.Browser.WebCryptoAPI.JSHelpers;
+﻿using Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.Params;
+using Glihm.JSInterop.Browser.WebCryptoAPI.JSHelpers;
 
-namespace JSInterop.Browser.TestApp.Units.WebCrypto;
+namespace TestApp.Units.WebCrypto;
 
 public static class UWebCryptoCommon
 {

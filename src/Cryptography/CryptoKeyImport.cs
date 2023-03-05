@@ -1,6 +1,6 @@
-﻿using JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
+﻿using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.CryptoKeys;
 
-namespace JSInterop.Browser.WebCryptoAPI.Cryptography;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Cryptography;
 
 /// <summary>
 /// Describes a crypto key properties to be imported.

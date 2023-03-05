@@ -1,4 +1,4 @@
-﻿namespace JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.Params;
+﻿namespace Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.Params;
 
 /// <summary>
 /// Generator algorithms use to generate CryptoKey.

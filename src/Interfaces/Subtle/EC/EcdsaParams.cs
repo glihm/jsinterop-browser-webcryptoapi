@@ -1,7 +1,7 @@
-﻿using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.Params;
-using JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA;
+﻿using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.Params;
+using Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.SHA;
 
-namespace JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.EC;
+namespace Glihm.JSInterop.Browser.WebCryptoAPI.Interfaces.Subtle.EC;
 
 /// <summary>
 /// ECDSA params.
