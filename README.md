@@ -1,6 +1,6 @@
 # Glihm.JSInterop.Browser.WebCryptoAPI
 
-A convenient way to use browser cryptography from `C#`.
+A convenient way to use browser cryptography from `Blazor`.
 
 ## Motivation
 
