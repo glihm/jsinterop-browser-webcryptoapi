@@ -71,6 +71,10 @@ EncryptData(byte[] key, byte[] plaintext, byte[] iv)
 }
 ```
 
+I am working on a documentation to show examples for all the web crypto API. In the meanwhile, feel free to
+take a look at the [cryptography test code](https://github.com/glihm/jsinterop-browser-webcryptoapi/blob/main/test/Units/Cryptography/UWebCryptography.razor)
+which has some basic usecase I used to test the implementation.
+
 
 ## Note about umanaged resources
 
